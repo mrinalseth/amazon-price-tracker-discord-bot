@@ -16,12 +16,18 @@ def fetchPrice(arr):
       D[url]["latestPrice"] = latestPrice
       D[url]["priceHistory"].append(latestPrice)
       D[url]["averagePrice"] = sum(D[url]["priceHistory"])/len(D[url]["priceHistory"])
+      if latestPrice < D[url]["lowestPrice"]:
+        D[url]["lowestPrice"] = latestPrice
+      if latestPrice > D[url]["highestPrice"]:
+        D[url]["highestPrice"] = latestPrice
     else:
       newProduct = {
-        "name": productName,
+        "name": " ".join(productName.split(" ")[0:4]),
         "latestPrice": latestPrice,
         "priceHistory": [latestPrice],
-        "averagePrice": latestPrice
+        "averagePrice": latestPrice,
+        "lowestPrice": latestPrice,
+        "highestPrice": latestPrice
       }
       D[url] = newProduct
 
