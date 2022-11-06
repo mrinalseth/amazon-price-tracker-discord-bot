@@ -1,9 +1,14 @@
+import discord
+import os
 import requests
 from bs4 import BeautifulSoup
+from discord.ext import tasks, commands
+
 
 
 urls = []
 D = {}
+
 
 
 def fetchPrice(arr):
@@ -23,10 +28,10 @@ def fetchPrice(arr):
         D[url]["highestPrice"] = latestPrice
 
       if D[url]["lowestPrice"] >= latestPrice:
-        D[url]["response"].append("Today its price is lowest")
+        D[url]["response"] = "Today its price is lowest"
 
       elif D[url]["averagePrice"] >= latestPrice:
-        D[url]["response"].append("Today its price is lower average")
+        D[url]["response"] = "Today its price is lower average"
       
     else:
       newProduct = {
@@ -36,9 +41,10 @@ def fetchPrice(arr):
         "averagePrice": latestPrice,
         "lowestPrice": latestPrice,
         "highestPrice": latestPrice,
-        "response": []
+        "response": ""
       }
       D[url] = newProduct
+
 
 
 def addNewProduct(url):
@@ -47,18 +53,47 @@ def addNewProduct(url):
     urls.append(url)
 
 
+# addNewProduct("https://www.amazon.in/Uberlyfe-Seater-Sofa-Cum-SCB-001734-BK_A/dp/B07SC7M71D/ref=lp_27060486031_1_1")
+
+# addNewProduct("https://www.amazon.in/Seiko-Sports-Day-Date-Analog-Color/dp/B096G1SVZM/ref=sr_1_1?keywords=seiko&pf_rd_i=2563504031&pf_rd_m=A1VBAL9TL5WCBF&pf_rd_p=c0043bd7-04fa-4e5e-ab5b-3c68c27b9dd6&pf_rd_r=32YC0HW7SYH2RTV0RR5V&pf_rd_s=merchandised-search-12&pf_rd_t=30901&qid=1667420215&qu=eyJxc2MiOiI3LjU1IiwicXNhIjoiNy40NSIsInFzcCI6IjIuNTIifQ%3D%3D&s=watches&sr=1-1")
+
+# fetchPrice(urls)
+
+# print(D)
 
 
 
-addNewProduct("https://www.amazon.in/Uberlyfe-Seater-Sofa-Cum-SCB-001734-BK_A/dp/B07SC7M71D/ref=lp_27060486031_1_1")
+class MyClient(discord.Client):
+        
+    async def on_ready(self):
+      print(f'Logged on as {self.user}!')
+      
+    async def on_message(self, message):
+      if message.author == self.user:
+        return
 
-addNewProduct("https://www.amazon.in/Seiko-Sports-Day-Date-Analog-Color/dp/B096G1SVZM/ref=sr_1_1?keywords=seiko&pf_rd_i=2563504031&pf_rd_m=A1VBAL9TL5WCBF&pf_rd_p=c0043bd7-04fa-4e5e-ab5b-3c68c27b9dd6&pf_rd_r=32YC0HW7SYH2RTV0RR5V&pf_rd_s=merchandised-search-12&pf_rd_t=30901&qid=1667420215&qu=eyJxc2MiOiI3LjU1IiwicXNhIjoiNy40NSIsInFzcCI6IjIuNTIifQ%3D%3D&s=watches&sr=1-1")
+      if message.content.startswith('!fetch'):
+        msg = message.content
+        url = msg.split(' ')[1]
+        addNewProduct(url)
+        fetchPrice(urls)
+        fetchPrice(urls)
+        # await message.channel.send(D)
+        for url in urls:
+          await message.channel.send(f'''{D[url]["name"]}: {D[url]["response"]} || buy @Rs{D[url]["latestPrice"]}''')
 
-fetchPrice(urls)
+      if message.content.startswith('!trackhistory'):
+        print("hfh")
+        index = 1
+        for url in urls:
+          await message.channel.send(f"{index}. {D[url]['name']}")
+          index = index + 1
 
-print(D)
+intents = discord.Intents.default()
+intents.message_content = True
 
-# def foo(D):
-#   res = {}
-  
-    
+client = MyClient(intents=intents)
+
+
+
+client.run(os.getenv('TOKEN'))
