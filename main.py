@@ -67,6 +67,7 @@ class MyClient(discord.Client):
         
     async def on_ready(self):
       print(f'Logged on as {self.user}!')
+      foo.start()
       
     async def on_message(self, message):
       if message.author == self.user:
@@ -94,6 +95,8 @@ intents.message_content = True
 
 client = MyClient(intents=intents)
 
-
+@tasks.loop(seconds=5.0)
+async def foo():
+  print('bar')
 
 client.run(os.getenv('TOKEN'))
