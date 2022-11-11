@@ -8,6 +8,7 @@ from discord.ext import tasks, commands
 
 urls = []
 D = {}
+ID = 1037783815298498623
 
 
 
@@ -95,8 +96,16 @@ intents.message_content = True
 
 client = MyClient(intents=intents)
 
-@tasks.loop(seconds=5.0)
+@tasks.loop(seconds=3.0)
 async def foo():
-  print('bar')
+  # print('bar')
+  # if len(urls) > 0:
+  #   fetchPrice(urls)
+  #   for url in urls:
+  #     print(f'''{D[url]["name"]} || {D[url]["response"]} || buy @Rs{D[url]["latestPrice"]} || Recent prices: {D[url]['priceHistory']}''')
+  # else:
+  #   print('nothing is being tracked')
+  channel = client.get_channel(ID)
+  await channel.send('Sup?')
 
 client.run(os.getenv('TOKEN'))
